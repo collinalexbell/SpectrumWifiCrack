@@ -20,7 +20,7 @@ func main() {
 			}
 		}
 		if index%50 == 0 {
-			fmt.Printf("%f%% finished\n", float64(index)/length)
+			fmt.Printf("%f%% finished\n", float64(index)/length*100)
 		}
 	}
 	fmt.Printf("num combos: %v\n", combos)
