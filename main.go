@@ -8,45 +8,65 @@ import (
 	"unicode"
 )
 
+const bufferSize int = 1024 * 1024 * 5
+
 func main() {
 	fmt.Println("Spectrum Wifi Crack Expiriment")
 	fmt.Println(time.Now())
 	words := allWordsOfLength(5)
-	combos := 0
-	//bufferIndex := 0
 	length := float64(len(words))
-	fmt.Printf("num words %d\n", int(length))
-	const bufferSize int = 1024 * 1024 * 5
-	//newLine := []byte("\n")
-	//var buffer [bufferSize]byte
+	fmt.Printf("enumurating psk of the shape <5 letter word><5 letter word><x : [0:1000]\n")
+	fmt.Printf("Number of 5 letter words in dict: %d\n", int(length))
+	enumerations := int(length) * int(length) * 1000
+	fmt.Printf("Total enumerations to try: %d\n", enumerations)
+	gigabytes := float64(enumerations*(5+5+(2 /*average bytes in x*/)+(1 /*newline*/))) / 1e9
+	fmt.Printf("Password enumeration file in Gigabytes: %f\n", gigabytes)
 
+	buffer := make([]byte, bufferSize)
 	ints := rangeAsBytes(1000)
 
-	//var lenN int
-	for index, _ := range words { //first
-		for range words { //second
-			for range ints { //x
+	combos := 0
+	bufferIndex := 0
+	var bufferLength int
+	for index, first := range words {
+		for _, second := range words {
+			for _, x := range ints {
 				combos++
-				/*
-					copy(buffer[bufferIndex:bufferIndex+5], first)
-					copy(buffer[bufferIndex+5:bufferIndex+10], second)
-					lenN = len(x)
-					copy(buffer[bufferIndex+10:bufferIndex+10+lenN], x)
-					copy(buffer[bufferIndex+10+lenN:bufferIndex+10+lenN+1], newLine)
-					bufferIndex = bufferIndex + 11 + lenN
-					if bufferIndex+15 >= bufferSize {
-						bufferIndex = 0
-					}
-				*/
+				bufferIndex = copyPsk(buffer, first, second, x, bufferIndex)
+
+				if bufferIndex+15 >= bufferSize {
+					bufferLength = bufferIndex
+					saveBuffer(buffer, bufferLength)
+					bufferIndex = 0
+				}
 			}
 		}
 		if index%50 == 0 {
 			fmt.Printf("%f%% finished\n", float64(index)/length*100)
 		}
 	}
+	bufferLength = bufferIndex
+	saveBuffer(buffer, bufferLength)
 
 	fmt.Printf("num combos: %v\n", combos)
 	fmt.Println(time.Now())
+}
+
+func saveBuffer(buffer []byte, bufferLength int) {
+	// This function can be used to either write the buffer to a disk.
+	// To be implemented later (when I have the disk space to actually save the entire file)
+}
+
+var newLine []byte = []byte("\n")
+var lenN int
+
+func copyPsk(buffer []byte, first []byte, second []byte, x []byte, bufferIndex int) int {
+	copy(buffer[bufferIndex:bufferIndex+5], first)
+	copy(buffer[bufferIndex+5:bufferIndex+10], second)
+	lenN = len(x)
+	copy(buffer[bufferIndex+10:bufferIndex+10+lenN], x)
+	copy(buffer[bufferIndex+10+lenN:bufferIndex+10+lenN+1], newLine)
+	return bufferIndex + 11 + lenN
 }
 
 func rangeAsBytes(n int) [][]byte {
