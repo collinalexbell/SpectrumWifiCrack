@@ -25,13 +25,11 @@ func main() {
 	buffer := make([]byte, bufferSize)
 	ints := rangeAsBytes(1000)
 
-	combos := 0
 	bufferIndex := 0
 	var bufferLength int
 	for index, first := range words {
 		for _, second := range words {
 			for _, x := range ints {
-				combos++
 				bufferIndex = copyPsk(buffer, first, second, x, bufferIndex)
 
 				if bufferIndex+15 >= bufferSize {
@@ -48,7 +46,6 @@ func main() {
 	bufferLength = bufferIndex
 	saveBuffer(buffer, bufferLength)
 
-	fmt.Printf("num combos: %v\n", combos)
 	fmt.Println(time.Now())
 }
 
