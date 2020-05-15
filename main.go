@@ -14,17 +14,21 @@ func main() {
 	fmt.Println("Spectrum Wifi Crack Expiriment")
 	fmt.Println(time.Now())
 	words := allWordsOfLength(5)
-	length := float64(len(words))
 	fmt.Printf("enumurating psk of the shape <5 letter word><5 letter word><x : [0:1000]\n")
-	fmt.Printf("Number of 5 letter words in dict: %d\n", int(length))
-	enumerations := int(length) * int(length) * 1000
+	fmt.Printf("Number of 5 letter words in dict: %d\n", len(words))
+	enumerations := len(words) * len(words) * 1000
 	fmt.Printf("Total enumerations to try: %d\n", enumerations)
 	gigabytes := float64(enumerations*(5+5+(2 /*average bytes in x*/)+(1 /*newline*/))) / 1e9
 	fmt.Printf("Password enumeration file in Gigabytes: %f\n", gigabytes)
 
+	enumeratePotentialPasswords(words)
+	fmt.Println(time.Now())
+}
+
+func enumeratePotentialPasswords(words [][]byte) {
+	length := float64(len(words))
 	buffer := make([]byte, bufferSize)
 	ints := rangeAsBytes(1000)
-
 	bufferIndex := 0
 	var bufferLength int
 	for index, first := range words {
@@ -46,11 +50,10 @@ func main() {
 	bufferLength = bufferIndex
 	saveBuffer(buffer, bufferLength)
 
-	fmt.Println(time.Now())
 }
 
 func saveBuffer(buffer []byte, bufferLength int) {
-	// This function can be used to either write the buffer to a disk.
+	// This function can be used to either write the buffer to a disk or to give it to program like hashcat.
 	// To be implemented later (when I have the disk space to actually save the entire file)
 }
 
