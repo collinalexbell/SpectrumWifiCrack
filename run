@@ -1,0 +1,2 @@
+go build
+./spectrumWifiCrack | hashcat -m 2500  own.hccapx
